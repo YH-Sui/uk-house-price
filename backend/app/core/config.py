@@ -18,5 +18,8 @@ class Settings(BaseSettings):
     # Path to the UK HPI CSV — override via DATA_PATH env var in Docker/Railway
     DATA_PATH: str = str(_PROJECT_ROOT / "data" / "UK-HPI-full-file-2024-11.csv")
 
+    # CORS — comma-separated origins, override via env var in production
+    ALLOWED_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000"]
+
 
 settings = Settings()
