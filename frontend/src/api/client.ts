@@ -1,50 +1,37 @@
-﻿const BASE_URL = import.meta.env.VITE_API_URL ?? ''
-
-export type PropertyType = 'flat' | 'terraced' | 'semi_detached' | 'detached' | 'all'
+﻿const BASE = import.meta.env.VITE_API_URL ?? ''
 
 export interface PricePoint {
   date: string
   average_price: number
-  volume?: number
-}
-
-export interface PriceSeriesResponse {
   region: string
-  property_type: PropertyType
-  series: PricePoint[]
+  property_type: string
 }
 
-export interface PricesParams {
-  region: string
-  property_type?: PropertyType
-  date_from?: string
-  date_to?: string
-  indexed?: boolean
+export interface PricesResponse {
+  data: PricePoint[]
+  count: number
 }
 
-async function apiFetch<T>(path: string, params?: Record<string, string>): Promise<T> {
-  const url = new URL(`${BASE_URL}${path}`, window.location.origin)
-  if (params) {
-    Object.entries(params).forEach(([k, v]) => v !== undefined && url.searchParams.set(k, v))
-  }
+export async function fetchRegions(): Promise<string[]> {
+  const res = await fetch(`${BASE}/api/v1/regions/`)
+  if (!res.ok) throw new Error(`Regions fetch failed: ${res.status}`)
+  const data = await res.json()
+  return data.regions
+}
+
+export async function fetchPrices(params: {
+  region?: string
+  property_type?: string
+  start_date?: string
+  end_date?: string
+}): Promise<PricesResponse> {
+  const url = new URL(`${BASE}/api/v1/prices/`, window.location.origin)
+  if (params.region)        url.searchParams.set('region', params.region)
+  if (params.property_type) url.searchParams.set('property_type', params.property_type)
+  if (params.start_date)    url.searchParams.set('start_date', params.start_date)
+  if (params.end_date)      url.searchParams.set('end_date', params.end_date)
+
   const res = await fetch(url.toString())
-  if (!res.ok) throw new Error(`API error ${res.status}: ${res.statusText}`)
+  if (!res.ok) throw new Error(`Prices fetch failed: ${res.status}`)
   return res.json()
-}
-
-export const api = {
-  getPrices: (params: PricesParams) =>
-    apiFetch<PriceSeriesResponse>('/api/v1/prices/', {
-      region: params.region,
-      property_type: params.property_type ?? 'all',
-      ...(params.date_from && { date_from: params.date_from }),
-      ...(params.date_to && { date_to: params.date_to }),
-      ...(params.indexed !== undefined && { indexed: String(params.indexed) }),
-    }),
-
-  getRegions: () =>
-    apiFetch<{ regions: string[] }>('/api/v1/regions/'),
-
-  getLondonBoroughs: () =>
-    apiFetch<{ boroughs: string[] }>('/api/v1/regions/london/boroughs'),
 }
