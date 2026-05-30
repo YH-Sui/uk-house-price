@@ -1,7 +1,7 @@
 ﻿from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 
-# Project root is 2 levels up from this file (backend/app/core/config.py)
+# Project root is 3 levels up from this file (backend/app/core/config.py)
 _PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # Path to the UK HPI CSV — override via DATA_PATH env var in Docker/Railway
     DATA_PATH: str = str(_PROJECT_ROOT / "data" / "UK-HPI-full-file-2024-11.csv")
 
-    # CORS — comma-separated origins, override via env var in production
+    # CORS — override via ALLOWED_ORIGINS env var in production
     ALLOWED_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000"]
 
 
