@@ -1,5 +1,4 @@
 ﻿from fastapi import APIRouter, HTTPException, Query
-from typing import Optional
 
 from app.data.loader import load_hpi_data
 from app.models.price import PricePoint, PriceSeriesResponse
