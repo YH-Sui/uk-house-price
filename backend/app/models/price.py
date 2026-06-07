@@ -17,5 +17,5 @@ class PriceSeriesResponse(BaseModel):
     """Response wrapper for a price time series query."""
     region: str
     property_type: Optional[str] = None   # None means "all types"
-    data: list[PricePoint]
     count: int
+    data: list[PricePoint]
